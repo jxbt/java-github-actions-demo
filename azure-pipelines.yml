@@ -26,7 +26,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  NIGHTVISION_TOKEN: $NIGHTVISION_TOKEN
+  NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
   NIGHTVISION_TARGET: javaspringvulny-api-azure2
   NIGHTVISION_APP: javaspringvulny-api-azure2
   NIGHTVISION_AUTH: javaspringvulny-api-azure2
