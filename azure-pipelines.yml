@@ -46,7 +46,7 @@ stages:
       displayName: 'Install NightVision'
 
     - script: |
-        nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
+        nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring -p $NIGHTVISION_PROJECT || true
         if [ ! -e openapi-spec.yml ]; then
             cp backup-openapi-spec.yml openapi-spec.yml
         fi
@@ -54,7 +54,7 @@ stages:
       env:
         NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
         NIGHTVISION_TARGET: javaspringvulny-api-azure2
-
+        NIGHTVISION_PROJECT: testing
     - script: |
         docker-compose up -d
         sleep 60
@@ -69,6 +69,7 @@ stages:
         NIGHTVISION_TARGET: javaspringvulny-api-azure2
         NIGHTVISION_APP: javaspringvulny-api-azure2
         NIGHTVISION_AUTH: javaspringvulny-api-azure2
+        NIGHTVISION_PROJECT: testing
 
     - task: PublishPipelineArtifact@1
       inputs:
