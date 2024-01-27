@@ -26,11 +26,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
   NIGHTVISION_TARGET: javaspringvulny-api-azure2
   NIGHTVISION_APP: javaspringvulny-api-azure2
   NIGHTVISION_AUTH: javaspringvulny-api-azure2
-  NIGHTVISION_PROJECT:  testing
+  NIGHTVISION_PROJECT: testing
 
 stages:
 - stage: Test
@@ -52,6 +51,8 @@ stages:
             cp backup-openapi-spec.yml openapi-spec.yml
         fi
       displayName: 'Extract API Documentation from Code'
+      env:
+        NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
 
     - script: |
         docker-compose up -d
@@ -62,10 +63,11 @@ stages:
         nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
         nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
       displayName: 'Scan the API'
+      env:
+        NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
 
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: 'results.sarif'
         artifact: 'SARIF_File'
       displayName: 'Upload SARIF File'
-
