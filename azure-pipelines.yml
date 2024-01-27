@@ -1,19 +1,67 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# # Starter pipeline
+# # Start with a minimal pipeline that you can customize to build and deploy your code.
+# # Add steps that build, run tests, deploy, and more:
+# # https://aka.ms/yaml
+
+# trigger:
+# - main
+
+# pool:
+#   vmImage: ubuntu-latest
+
+# steps:
+# - script: echo Hello, world!
+#   displayName: 'Run a one-line script'
+
+# - script: |
+#     echo Add other tasks to build, test, and deploy your project.
+#     echo See https://aka.ms/yaml
+#   displayName: 'Run a multi-line script'
+
 
 trigger:
 - main
 
+variables:
+  - name: NIGHTVISION_TARGET
+    value: javaspringvulny-api-gitlab
+  - name: NIGHTVISION_APP
+    value: javaspringvulny-api-gitlab
+  - name: NIGHTVISION_AUTH
+    value: javaspringvulny-api-gitlab
+  - name: DOCKER_HOST
+    value: tcp://docker:2375/
+  - name: DOCKER_DRIVER
+    value: overlay2
+  - name: FF_NETWORK_PER_BUILD
+    value: "true"
+
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+- stage: Test
+  jobs:
+  - job: Build
+    steps:
+    - script: |
+        apt-get update && apt-get install -y wget python3-venv python3-docker python3-pip python3 docker-compose curl gcc musl-dev libffi-dev
+        python3 -m venv venv
+        source venv/bin/activate
+        pip3 install requests urllib3 semgrep
+        wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
+        mv nightvision /usr/local/bin/
+        nightvision swagger extract ./ --lang spring -t $(NIGHTVISION_APP) || true
+        if [ ! -e openapi-spec.yml ]; then cp backup-openapi-spec.yml openapi-spec.yml; fi
+        docker-compose up -d
+        sleep 60
+        nightvision scan -t $(NIGHTVISION_TARGET) -a $(NIGHTVISION_APP) --auth $(NIGHTVISION_AUTH) > scan-results.txt
+        nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
+        for pod in $(docker ps | grep -v 'CONTAINER ID' | grep -v IMAGE | awk '{print $1}'); do docker logs $pod >> test.pod.logs 2>&1; done
+      displayName: 'Run tests and export results'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    - publish: $(System.DefaultWorkingDirectory)
+      artifact: openapi-spec.yml
+      artifact: test.pod.logs
+      artifact: results.sarif
+      displayName: 'Publish Artifacts'
