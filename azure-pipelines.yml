@@ -24,11 +24,13 @@ trigger:
 
 variables:
   - name: NIGHTVISION_TARGET
-    value: javaspringvulny-api-gitlab
+    value: javaspringvulny-api-azure
   - name: NIGHTVISION_APP
-    value: javaspringvulny-api-gitlab
+    value: javaspringvulny-api-azure
   - name: NIGHTVISION_AUTH
-    value: javaspringvulny-api-gitlab
+    value: javaspringvulny-api-azure
+  - name: NIGHTVISION_PROJECT
+    value: testing
   - name: DOCKER_HOST
     value: tcp://docker:2375/
   - name: DOCKER_DRIVER
@@ -52,12 +54,12 @@ stages:
         pip3 install requests urllib3 semgrep
         wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
         mv nightvision /usr/local/bin/
-        nightvision swagger extract ./ --lang spring -t javaspringvulny-api-gitlab || true
+        nightvision swagger extract ./ --lang spring -t "$NIGHTVISION_TARGET -p $NIGHTVISION_PROJECT|| true
         if [ ! -e openapi-spec.yml ]; then cp backup-openapi-spec.yml openapi-spec.yml; fi
         docker-compose up -d
         sleep 60
         curl -k https://docker:9000
-        nightvision scan -t javaspringvulny-api-gitlab -a javaspringvulny-api-gitlab --auth javaspringvulny-api-gitlab > scan-results.txt
+        nightvision scan -t "$NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH -p $NIGHTVISION_PROJECT > scan-results.txt
         nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
         for pod in $(docker ps | grep -v 'CONTAINER ID' | grep -v IMAGE | awk '{print $1}'); do docker logs $pod >> test.pod.logs 2>&1; done
       displayName: 'Run tests and export results'
