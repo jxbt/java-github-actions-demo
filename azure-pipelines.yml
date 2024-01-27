@@ -59,9 +59,17 @@ stages:
         nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
         for pod in $(docker ps | grep -v 'CONTAINER ID' | grep -v IMAGE | awk '{print $1}'); do docker logs $pod >> test.pod.logs 2>&1; done
       displayName: 'Run tests and export results'
+      env:
+        NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
 
-    - publish: $(System.DefaultWorkingDirectory)
-      artifact: openapi-spec.yml
-      artifact: test.pod.logs
-      artifact: results.sarif
-      displayName: 'Publish Artifacts'
+    - publish: $(System.DefaultWorkingDirectory)/openapi-spec.yml
+      artifact: openapi-spec
+      displayName: 'Publish OpenAPI Spec'
+
+    - publish: $(System.DefaultWorkingDirectory)/test.pod.logs
+      artifact: test-pod-logs
+      displayName: 'Publish Test Pod Logs'
+
+    - publish: $(System.DefaultWorkingDirectory)/results.sarif
+      artifact: results-sarif
+      displayName: 'Publish SARIF Results'
