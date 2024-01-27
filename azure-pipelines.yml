@@ -57,7 +57,7 @@ stages:
         NIGHTVISION_PROJECT: testing
     - script: |
         docker-compose up -d
-        sleep 60
+        sleep 20
       displayName: 'Start the App'
 
     - script: |
