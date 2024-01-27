@@ -1,35 +1,8 @@
-# # Starter pipeline
-# # Start with a minimal pipeline that you can customize to build and deploy your code.
-# # Add steps that build, run tests, deploy, and more:
-# # https://aka.ms/yaml
-
-# trigger:
-# - main
-
-# pool:
-#   vmImage: ubuntu-latest
-
-# steps:
-# - script: echo Hello, world!
-#   displayName: 'Run a one-line script'
-
-# - script: |
-#     echo Add other tasks to build, test, and deploy your project.
-#     echo See https://aka.ms/yaml
-#   displayName: 'Run a multi-line script'
-
-
 trigger:
 - main
 
 pool:
   vmImage: 'ubuntu-latest'
-
-variables:
-  NIGHTVISION_TARGET: javaspringvulny-api-azure2
-  NIGHTVISION_APP: javaspringvulny-api-azure2
-  NIGHTVISION_AUTH: javaspringvulny-api-azure2
-  NIGHTVISION_PROJECT: testing
 
 stages:
 - stage: Test
@@ -51,6 +24,7 @@ stages:
             cp backup-openapi-spec.yml openapi-spec.yml
         fi
       displayName: 'Extract API Documentation from Code'
+
       env:
         NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
         NIGHTVISION_TARGET: javaspringvulny-api-azure2
