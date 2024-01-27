@@ -22,58 +22,50 @@
 trigger:
 - main
 
-variables:
-  - name: NIGHTVISION_TARGET
-    value: javaspringvulny-api-azure
-  - name: NIGHTVISION_APP
-    value: javaspringvulny-api-azure
-  - name: NIGHTVISION_AUTH
-    value: javaspringvulny-api-azure
-  - name: NIGHTVISION_PROJECT
-    value: testing
-  - name: DOCKER_HOST
-    value: tcp://docker:2375/
-  - name: DOCKER_DRIVER
-    value: overlay2
-  - name: FF_NETWORK_PER_BUILD
-    value: "true"
-
 pool:
   vmImage: 'ubuntu-latest'
+
+variables:
+  NIGHTVISION_TOKEN: $NIGHTVISION_TOKEN
+  NIGHTVISION_TARGET: javaspringvulny-api-azure2
+  NIGHTVISION_APP: javaspringvulny-api-azure2
+  NIGHTVISION_AUTH: javaspringvulny-api-azure2
+  NIGHTVISION_PROJECT:  testing
 
 stages:
 - stage: Test
   jobs:
-  - job: Build
+  - job: BuildAndTest
     steps:
+    - checkout: self
+      displayName: 'Clone Code'
+
     - script: |
-        echo "$NIGHTVISION_TARGET , $NIGHTVISION_APP , $NIGHTVISION_AUTH"
-        apt-get update && apt-get install -y wget python3-venv python3-docker python3-pip python3 docker-compose curl gcc musl-dev libffi-dev
-        python3 -m venv venv
-        source venv/bin/activate
-        pip3 install requests urllib3 semgrep
         wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
-        mv nightvision /usr/local/bin/
-        nightvision swagger extract ./ --lang spring -t "$NIGHTVISION_TARGET -p $NIGHTVISION_PROJECT|| true
-        if [ ! -e openapi-spec.yml ]; then cp backup-openapi-spec.yml openapi-spec.yml; fi
+        sudo mv nightvision /usr/local/bin/
+        python -m pip install semgrep --user
+      displayName: 'Install NightVision'
+
+    - script: |
+        nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
+        if [ ! -e openapi-spec.yml ]; then
+            cp backup-openapi-spec.yml openapi-spec.yml
+        fi
+      displayName: 'Extract API Documentation from Code'
+
+    - script: |
         docker-compose up -d
         sleep 60
-        curl -k https://docker:9000
-        nightvision scan -t "$NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH -p $NIGHTVISION_PROJECT > scan-results.txt
+      displayName: 'Start the App'
+
+    - script: |
+        nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
         nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
-        for pod in $(docker ps | grep -v 'CONTAINER ID' | grep -v IMAGE | awk '{print $1}'); do docker logs $pod >> test.pod.logs 2>&1; done
-      displayName: 'Run tests and export results'
-      env:
-        NIGHTVISION_TOKEN: $(NIGHTVISION_TOKEN)
+      displayName: 'Scan the API'
 
-    - publish: $(System.DefaultWorkingDirectory)/openapi-spec.yml
-      artifact: openapi-spec
-      displayName: 'Publish OpenAPI Spec'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'results.sarif'
+        artifact: 'SARIF_File'
+      displayName: 'Upload SARIF File'
 
-    - publish: $(System.DefaultWorkingDirectory)/test.pod.logs
-      artifact: test-pod-logs
-      displayName: 'Publish Test Pod Logs'
-
-    - publish: $(System.DefaultWorkingDirectory)/results.sarif
-      artifact: results-sarif
-      displayName: 'Publish SARIF Results'
