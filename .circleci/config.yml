@@ -24,6 +24,11 @@ jobs:
             sudo mv nightvision /usr/local/bin/
 
       - run:
+          name: Authenticate NightVision
+          command: |
+            nightvision login --token $NIGHTVISION_TOKEN
+            
+      - run:
           name: Extract API documentation from code
           command: |
             nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
