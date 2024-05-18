@@ -29,6 +29,7 @@ jobs:
             nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
             if [ ! -e openapi-spec.yml ]; then
               cp backup-openapi-spec.yml openapi-spec.yml
+            fi
 
       - run:
           name: Start the app
