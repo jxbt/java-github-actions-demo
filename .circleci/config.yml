@@ -34,7 +34,7 @@ jobs:
           name: Start the app
           command: |
             docker-compose up -d
-            sleep 20
+            sleep 60
 
       - run:
           name: Scan the API
