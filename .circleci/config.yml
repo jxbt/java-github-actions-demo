@@ -8,6 +8,11 @@ executors:
 jobs:
   test:
     executor: python-executor
+    environment:
+      NIGHTVISION_TOKEN: $NIGHTVISION_TOKEN
+      NIGHTVISION_TARGET: javaspringvulny-api
+      NIGHTVISION_APP: javaspringvulny-api
+      NIGHTVISION_AUTH: javaspringvulny-api
     steps:
       - checkout
 
