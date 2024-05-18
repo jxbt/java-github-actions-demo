@@ -1,0 +1,69 @@
+version: 2.1
+
+executors:
+  python-executor:
+    docker:
+      - image: circleci/python:3.8
+
+jobs:
+  test:
+    executor: python-executor
+    steps:
+      - checkout
+
+      - run:
+          name: Install Dependencies
+          command: |
+            sudo apt-get update
+            wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
+            sudo mv nightvision /usr/local/bin/
+
+      - run:
+          name: Extract API documentation from code
+          command: |
+            nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
+            if [ ! -e openapi-spec.yml ]; then
+              cp backup-openapi-spec.yml openapi-spec.yml
+
+      - run:
+          name: Start the app
+          command: |
+            docker-compose up -d
+            sleep 10
+
+      - run:
+          name: Scan the API
+          command: |
+            nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
+            nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
+
+
+      - run:
+          name:  Install nightvision PDF report generator and dependencies
+          command: |
+            git clone https://github.com/jxbt/nightvision_reporter.git
+            cd nightvision_reporter
+            sudo apt-get update
+            sudo apt-get install -y python3-pip python3-venv google-chrome-stable
+            python3 -m venv .venv
+            source .venv/bin/activate
+            pip3 install -r requirements.txt  
+
+
+      - run:
+          name: Generate PDF Report from SARIF
+          command: |
+
+            cd nightvision_reporter
+            source .venv/bin/activate
+            python main.py --sarif ../results.sarif --out nightvision-report.pdf
+
+      - store_artifacts:
+          path: nightvision-report.pdf
+          destination: reports/nightvision-report.pdf
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
