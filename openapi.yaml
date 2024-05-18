@@ -4,7 +4,7 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-  - url: https://localhost:9000
+  - url: http://localhost:9000
     description: Generated server url
 paths:
   "/api/token/items/search/":
