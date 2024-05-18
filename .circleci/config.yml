@@ -31,26 +31,10 @@ jobs:
             fi
 
       - run:
-          name: Build Docker Images
+          name: Start the app
           command: |
-            docker build -t stackhawk/javavulny .
-            docker pull postgres:latest
-
-      - run:
-          name: Start Database Container
-          command: |
-            docker run -d --name db -e POSTGRES_DB=postgresql -e POSTGRES_USER=postgresql -e POSTGRES_PASSWORD=postgresql -p 5432:5432 postgres:latest
-
-      - run:
-          name: Start Application Container
-          command: |
-            docker run -d --name javavulny --link db -e SPRING_PROFILES_ACTIVE=postgresql -p 9000:9000 stackhawk/javavulny
-
-      - run:
-          name: Wait for Application to be Ready
-          command: |
-            sleep 20
-
+            docker-compose up -d
+            sleep 600
 
       - run:
           name: Scan the API
