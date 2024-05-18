@@ -1,13 +1,12 @@
 version: 2.1
 
-executors:
-  python-executor:
-    docker:
-      - image: circleci/python:3.8
+
 
 jobs:
   test:
-    executor: python-executor
+  machine: 
+    image: ubuntu-2004:202010-01
+
     environment:
       NIGHTVISION_TARGET: javaspringvulny-api
       NIGHTVISION_APP: javaspringvulny-api
