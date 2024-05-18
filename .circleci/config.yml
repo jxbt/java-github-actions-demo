@@ -30,11 +30,14 @@ jobs:
               cp backup-openapi-spec.yml openapi-spec.yml
             fi
 
+      - setup_remote_docker
+
       - run:
           name: Start the app
           command: |
+            docker-compose build
             docker-compose up -d
-            sleep 500
+            sleep 20
 
       - run:
           name: Scan the API
