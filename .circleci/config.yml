@@ -20,7 +20,7 @@ jobs:
             sudo apt-get update
             wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
             sudo mv nightvision /usr/local/bin/
-            python -m pip install semgrep --user
+            python3 -m pip install semgrep --user
 
       - run:
           name: Extract API documentation from code
@@ -61,7 +61,7 @@ jobs:
 
             cd nightvision_reporter
             source .venv/bin/activate
-            python main.py --sarif ../results.sarif --out nightvision-report.pdf
+            python3 main.py --sarif ../results.sarif --out nightvision-report.pdf
 
       - store_artifacts:
           path: nightvision-report.pdf
