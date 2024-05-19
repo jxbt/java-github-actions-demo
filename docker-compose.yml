@@ -2,11 +2,12 @@ version: "3.2"
 services:
   db:
     image: postgres
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=postgresql
       - POSTGRES_USER=postgresql
       - POSTGRES_PASSWORD=postgresql
-    network_mode: host
 
   javavulny:
     build: .
@@ -14,6 +15,9 @@ services:
     container_name: javavulny
     environment:
       SPRING_PROFILES_ACTIVE: postgresql
-    network_mode: host
+    ports:
+      - "9000:9000"
+    links:
+      - db
     depends_on:
       - db
