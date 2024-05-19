@@ -4,8 +4,8 @@ version: 2.1
 
 jobs:
   test:
-    docker:
-      - image: cimg/base:2024.05
+    machine:
+      - image: ubuntu-2204:2024.04.4
 
     environment:
       NIGHTVISION_TARGET: javaspringvulny-api
@@ -30,12 +30,9 @@ jobs:
               cp backup-openapi-spec.yml openapi-spec.yml
             fi
 
-      - setup_remote_docker
-
       - run:
           name: Start the app
           command: |
-            docker-compose build
             docker-compose up -d
             sleep 20
 
