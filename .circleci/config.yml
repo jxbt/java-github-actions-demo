@@ -17,7 +17,7 @@ jobs:
       - run:
           name: Install Dependencies
           command: |
-            sudo apt-get update && sudo apt-get install python3-pip
+            sudo apt-get update && sudo apt-get install -y python3-pip
             wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
             sudo mv nightvision /usr/local/bin/
             python3 -m pip install semgrep --user
