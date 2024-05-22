@@ -4,8 +4,8 @@ version: 2.1
 
 jobs:
   test:
-    machine:
-      image: ubuntu-2204:2024.04.4
+    machine: true
+    resource_class: g9ahcd1mynjygq5ixyfwak/nv2
 
     environment:
       NIGHTVISION_TARGET: javaspringvulny-api
