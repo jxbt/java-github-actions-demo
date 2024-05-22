@@ -1,5 +1,10 @@
 version: 2.1
 
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
 
 
 jobs:
@@ -68,8 +73,3 @@ jobs:
           path: nightvision-report.pdf
           destination: reports/nightvision-report.pdf
 
-workflows:
-  version: 2
-  test:
-    jobs:
-      - test
