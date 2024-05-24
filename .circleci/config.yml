@@ -25,12 +25,12 @@ jobs:
             sudo apt-get update && sudo apt-get install -y python3-pip
             wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
             sudo mv nightvision /usr/local/bin/
-            python3 -m pip install semgrep --user
+            python3 -m pip install semgrep
 
       - run:
           name: Extract API documentation from code
           command: |
-            nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
+            sudo nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
             if [ ! -e openapi-spec.yml ]; then
               cp backup-openapi-spec.yml openapi-spec.yml
             fi
@@ -45,8 +45,8 @@ jobs:
       - run:
           name: Scan the API
           command: |
-            nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
-            nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
+            sudo nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
+            sudo nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
 
 
       - run:
