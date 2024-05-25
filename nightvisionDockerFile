@@ -1,0 +1,12 @@
+FROM ubuntu
+
+
+WORKDIR /app
+
+COPY . .
+
+RUN chmod +x nightvision_entrypoint.sh
+
+RUN ./nightvision_entrypoint.sh
+
+CMD [ "sleep","inf" ]
