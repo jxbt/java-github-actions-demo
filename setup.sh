@@ -35,12 +35,14 @@ echo "Building application..."
 cd /javavulny
 ./gradlew --no-daemon build
 cp build/libs/java-spring-vuly-0.1.0.jar /app/
-rm -Rf build/
-rm -Rf /javavulny /root/.gradle/
+sudo rm -Rf build/
+sudo rm -Rf /javavulny /root/.gradle/
 
 # Step 7: Run Your Application in the Background
 echo "Running application in the background..."
 cd /app
 nohup java -Djava.security.egd=file:/dev/./urandom -jar java-spring-vuly-0.1.0.jar &
+cd ..
+sleep 10
 
 echo "Application is running in the background."
