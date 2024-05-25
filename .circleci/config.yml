@@ -9,8 +9,8 @@ workflows:
 
 jobs:
   test:
-    machine: true
-    resource_class: g9ahcd1mynjygq5ixyfwak/nv3
+    machine:
+      image: ubuntu-2204:2024.04.4
 
     environment:
       NIGHTVISION_TARGET: javaspringvulny-api
@@ -55,7 +55,10 @@ jobs:
             git clone https://github.com/jxbt/nightvision_reporter.git
             cd nightvision_reporter
             sudo apt-get update
-            sudo apt-get install -y python3-pip python3-venv google-chrome-stable
+            sudo apt-get install -y python3-pip python3-venv
+            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo dpkg -i google-chrome-stable_current_amd64.deb
+            sudo apt --fix-broken install
             python3 -m venv .venv
             source .venv/bin/activate
             pip3 install -r requirements.txt  
