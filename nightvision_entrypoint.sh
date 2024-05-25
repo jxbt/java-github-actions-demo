@@ -17,10 +17,7 @@ git clone https://github.com/jxbt/nightvision_reporter.git
 cd nightvision_reporter
 apt-get update
 apt-get install -y python3-pip python3-venv google-chrome-stable
-python3 -m venv .venv
-source .venv/bin/activate
 pip3 install -r requirements.txt  
 
 cd nightvision_reporter
-source .venv/bin/activate
 python3 main.py --sarif ../results.sarif --out nightvision-report.pdf
