@@ -54,11 +54,7 @@ jobs:
           command: |
             git clone https://github.com/jxbt/nightvision_reporter.git
             cd nightvision_reporter
-            sudo apt-get update
-            sudo apt-get install -y python3-pip python3-venv
-            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-            sudo dpkg -i google-chrome-stable_current_amd64.deb
-            sudo apt --fix-broken install
+            chmod +x install.sh && sudo ./install.sh
             python3 -m venv .venv
             source .venv/bin/activate
             pip3 install -r requirements.txt  
