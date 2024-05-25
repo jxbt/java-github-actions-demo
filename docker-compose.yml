@@ -21,3 +21,20 @@ services:
       - db
     depends_on:
       - db
+
+  nightvision:
+    build:
+      context: .
+      dockerfile: nightvisionDockerFile
+    
+    volumes:
+      - nightvision:/app/
+
+
+volumes:
+  nightvision:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /nightvision
