@@ -51,10 +51,11 @@ jobs:
 
       - run:
           name:  Install nightvision PDF report generator and dependencies
+          shell: /bin/bash
           command: |
             git clone https://github.com/jxbt/nightvision_reporter.git
             cd nightvision_reporter
-            chmod +x install.sh && sudo ./install.sh
+            chmod +x install.sh
             python3 -m venv .venv
             source .venv/bin/activate
             pip3 install -r requirements.txt  
