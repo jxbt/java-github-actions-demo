@@ -22,13 +22,16 @@ services:
     depends_on:
       - db
 
-  nightvision:
+  nightvisionscanner:
     build:
       context: .
       dockerfile: nightvisionDockerFile
     
     volumes:
       - nightvision:/app/
+
+    depends_on:
+      - javavulny
 
 
 volumes:
