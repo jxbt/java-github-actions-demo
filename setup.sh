@@ -24,7 +24,7 @@ sudo apt install -y openjdk-11-jdk
 echo "Setting up application directories..."
 mkdir -p /javavulny /app
 echo "Copying application files..."
-cp -r /path/to/your/project/* /javavulny/
+cp -r ./* /javavulny/
 
 # Step 5: Modify Configuration
 echo "Modifying PostgreSQL configuration..."
