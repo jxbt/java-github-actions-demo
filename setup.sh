@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Define the directories
+APP_DIR="$HOME/javavulny"
+BUILD_DIR="$HOME/app"
+
 # Step 1: Install PostgreSQL
 echo "Installing PostgreSQL..."
 sudo apt update
@@ -22,27 +26,25 @@ sudo apt install -y openjdk-11-jdk
 
 # Step 4: Set Up Your Application
 echo "Setting up application directories..."
-mkdir -p /javavulny /app
+mkdir -p "$APP_DIR" "$BUILD_DIR"
 echo "Copying application files..."
-cp -r ./* /javavulny/
+cp -r ./* "$APP_DIR/"
 
 # Step 5: Modify Configuration
 echo "Modifying PostgreSQL configuration..."
-sed -i 's/localhost:5432/db:5432/' /javavulny/src/main/resources/application-postgresql.properties
+sed -i 's/localhost:5432/db:5432/' "$APP_DIR/src/main/resources/application-postgresql.properties"
 
 # Step 6: Build Your Application
 echo "Building application..."
-cd /javavulny
+cd "$APP_DIR"
 ./gradlew --no-daemon build
-cp build/libs/java-spring-vuly-0.1.0.jar /app/
-sudo rm -Rf build/
-sudo rm -Rf /javavulny /root/.gradle/
+cp build/libs/java-spring-vuly-0.1.0.jar "$BUILD_DIR/"
+rm -Rf build/ "$APP_DIR" /root/.gradle/
 
 # Step 7: Run Your Application in the Background
 echo "Running application in the background..."
-cd /app
-nohup java -Djava.security.egd=file:/dev/./urandom -jar java-spring-vuly-0.1.0.jar &
-cd ..
+cd "$BUILD_DIR"
+nohup java -Djava.security.egd=file:/dev/./urandom -jar java-spring-vuly-0.1.0.jar > app.log 2>&1 &
 sleep 10
 
-echo "Application is running in the background."
+echo "Application is running in the background. Check app.log for output."
