@@ -41,8 +41,7 @@ jobs:
       - run:
           name: Start the app
           command: |
-            chmod +x setup.sh
-            sudo ./setup.sh
+            docker compose up -d
             sleep 20
 
       - run:
