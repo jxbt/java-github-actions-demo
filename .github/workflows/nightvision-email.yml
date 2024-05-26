@@ -10,7 +10,7 @@ env:
   NIGHTVISION_APP: javaspringvulny-api
   NIGHTVISION_AUTH: javaspringvulny-api
   SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-  SENDER_PASSWORD: "${{ secrets.SENDER_PASSWORD }}"
+  SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
   RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
   
 jobs:
@@ -21,11 +21,12 @@ jobs:
     steps:
       - name: (1) Clone Code
         uses: actions/checkout@v3
-
-      - name: t123
+        
+      - name: (8) Debug Environment Variables
         run: |
-          echo "${{ env.SENDER_PASSWORD }}"
-      
+          echo "SENDER_EMAIL=${{ env.SENDER_EMAIL }}"
+          echo "SENDER_PASSWORD=${{ env.SENDER_PASSWORD }}"
+          echo "RECEIVER_EMAIL=${{ env.RECEIVER_EMAIL }}"
       # - name: (2) Install NightVision
       #   run: |
       #     wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
