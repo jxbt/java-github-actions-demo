@@ -74,6 +74,6 @@ jobs:
             python3 main.py --sarif ../results.sarif --out nightvision-report.pdf
 
       - store_artifacts:
-          path: nightvision-report.pdf
+          path: nightvision_reporter/nightvision-report.pdf
           destination: reports/nightvision-report.pdf
 
