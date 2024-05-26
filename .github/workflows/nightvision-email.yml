@@ -53,7 +53,7 @@ jobs:
 
       - name: (7) Install nightvision mailer reporter and dependencies
         run: |
-          git clone git@github.com:jxbt/nightvision_mail_reporter.git
+          git clone https://github.com/jxbt/nightvision_mail_reporter.git
           cd nightvision_mail_reporter
           chmod +x install.sh && sudo ./install.sh
           python3 -m venv .venv
