@@ -54,8 +54,7 @@ jobs:
         run: |
           git clone https://github.com/jxbt/nightvision_slack_importer.git
           cd nightvision_slack_importer
-          sudo apt-get update
-          sudo apt-get install -y python3-pip python3-venv google-chrome-stable
+          chmod +x install.sh && sudo ./install.sh
           python3 -m venv .venv
           source .venv/bin/activate
           pip3 install -r requirements.txt
