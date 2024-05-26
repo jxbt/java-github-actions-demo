@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Start the app
           command: |
-            docker compose up -d
+            sudo docker compose up -d
             sleep 20
 
       - run:
