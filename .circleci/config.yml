@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Start the app
           command: |
-            docker compose up -d
+            sudo docker compose up -d
             sleep 20
 
 
@@ -51,11 +51,12 @@ jobs:
 
       - run:
           name:  Install nightvision PDF report generator and dependencies
+          shell: /bin/bash
           command: |
             git clone https://github.com/jxbt/nightvision_reporter.git
             cd nightvision_reporter
-            sudo apt-get update
-            sudo apt-get install -y python3-pip python3-venv google-chrome-stable
+            chmod +x install.sh
+            sudo ./install.sh
             python3 -m venv .venv
             source .venv/bin/activate
             pip3 install -r requirements.txt  
@@ -72,4 +73,3 @@ jobs:
       - store_artifacts:
           path: nightvision-report.pdf
           destination: reports/nightvision-report.pdf
-
