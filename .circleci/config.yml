@@ -9,11 +9,11 @@ workflows:
 
 jobs:
   test:
-    # machine: true
-    # resource_class: g9ahcd1mynjygq5ixyfwak/nv3
-    
-    machine:
-      image: ubuntu-2204:2024.04.4
+    machine: true
+    resource_class: g9ahcd1mynjygq5ixyfwak/nv3
+
+    # machine:
+    #   image: ubuntu-2204:2024.04.4
 
     environment:
       NIGHTVISION_TARGET: javaspringvulny-api
