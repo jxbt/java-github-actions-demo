@@ -55,7 +55,7 @@ jobs:
         run: |
           git clone git@github.com:jxbt/nightvision_mail_reporter.git
           cd nightvision_mail_reporter
-          chmod +x install.sh && ./install.sh
+          chmod +x install.sh && sudo ./install.sh
           python3 -m venv .venv
           source .venv/bin/activate
           pip3 install -r requirements.txt
