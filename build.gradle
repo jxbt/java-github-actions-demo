@@ -5,7 +5,7 @@
 group 'hawk'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 18
+sourceCompatibility = 1.8
 targetCompatibility = 18
 
 repositories {
@@ -42,8 +42,8 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 18
+targetCompatibility = 18
 
 dependencies {
 
