@@ -41,7 +41,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 # Step 6: Build Your Application
 echo "Building application..."
 cd "$APP_DIR"
-./gradlew --no-daemon build
+./gradlew --no-daemon clean build --stacktrace
 cp build/libs/java-spring-vuly-0.1.0.jar "$BUILD_DIR/"
 rm -Rf build/ "$APP_DIR" /root/.gradle/
 
