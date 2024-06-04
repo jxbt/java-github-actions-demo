@@ -1,6 +1,4 @@
-language: java
-jdk:
-  - openjdk11
+dist: jammy
 
 services:
   - docker
@@ -14,7 +12,7 @@ env:
     - secure: <encrypted-SLACK_TOKEN>
     - secure: <encrypted-SLACK_CHANNEL_ID>
 
-before_install:
+script:
   # Update packages and install Docker Compose
   - sudo apt-get update
   - sudo apt-get install -y docker-compose
@@ -23,8 +21,7 @@ before_install:
   - wget -qO- https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz | tar -xz
   - sudo mv nightvision /usr/local/bin/
   - pip install --user semgrep
-
-script:
+  
   - echo "(3) Extract API documentation from code"
   - |
     nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
