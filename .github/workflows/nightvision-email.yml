@@ -1,7 +1,4 @@
 dist: jammy
-language: java
-jdk:
-  - openjdk11
 
 services:
   - docker
