@@ -19,6 +19,11 @@ before_install:
   - wget -qO- https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz | tar -xz
   - sudo mv nightvision /usr/local/bin/
   - pip3 install --user semgrep
+  - echo "SENDER_EMAIL: $SENDER_EMAIL"
+  - echo "RECEIVER_EMAIL: $RECEIVER_EMAIL"
+  - echo "SENDER_PASSWORD: $SENDER_PASSWORD"
+  - echo "NIGHTVISION_TARGET: $NIGHTVISION_TARGET"
+
 
 script:
   - echo "(3) Extract API documentation from code"
