@@ -30,7 +30,7 @@ script:
 
   - echo "(4) Start the app"
   - docker-compose up -d
-  - sleep 10
+  - sleep 60
 
   - echo "(5) Scan the API"
   - nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
