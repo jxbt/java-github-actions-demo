@@ -14,15 +14,16 @@ env:
     - secure: <encrypted-RECEIVER_EMAIL>
 
 before_install:
+  - echo "$SENDER_EMAIL"
+  - echo "$RECEIVER_EMAIL"
+  - echo "$SENDER_PASSWORD"
+  - echo "$NIGHTVISION_TOKEN"
   - sudo apt-get update
   - sudo apt-get install -y docker-compose python3-pip
   - wget -qO- https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz | tar -xz
   - sudo mv nightvision /usr/local/bin/
   - pip3 install --user semgrep
-  - echo "SENDER_EMAIL: $SENDER_EMAIL"
-  - echo "RECEIVER_EMAIL: $RECEIVER_EMAIL"
-  - echo "SENDER_PASSWORD: $SENDER_PASSWORD"
-  - echo "NIGHTVISION_TARGET: $NIGHTVISION_TARGET"
+
 
 
 script:
