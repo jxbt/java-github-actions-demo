@@ -1,0 +1,59 @@
+language: java
+jdk:
+  - openjdk11
+
+services:
+  - docker
+
+env:
+  global:
+    - NIGHTVISION_TARGET=javaspringvulny-api
+    - NIGHTVISION_APP=javaspringvulny-api
+    - NIGHTVISION_AUTH=javaspringvulny-api
+    - secure: <encrypted-NIGHTVISION_TOKEN>
+    - secure: <encrypted-SLACK_TOKEN>
+    - secure: <encrypted-SLACK_CHANNEL_ID>
+
+before_install:
+  # Update packages and install Docker Compose
+  - sudo apt-get update
+  - sudo apt-get install -y docker-compose
+
+  # Install NightVision and semgrep
+  - wget -qO- https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz | tar -xz
+  - sudo mv nightvision /usr/local/bin/
+  - pip install --user semgrep
+
+script:
+  - echo "(3) Extract API documentation from code"
+  - |
+    nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
+    if [ ! -e openapi-spec.yml ]; then
+        cp backup-openapi-spec.yml openapi-spec.yml
+    fi
+
+  - echo "(4) Start the app"
+  - docker-compose up -d
+  - sleep 10
+
+  - echo "(5) Scan the API"
+  - nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
+  - nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
+
+  - echo "(6) Upload SARIF file to GitHub Security Alerts if vulnerabilities are found"
+  # Add custom script or API call to upload SARIF file
+
+  - echo "(7) Install nightvision slack importer and dependencies"
+  - git clone https://github.com/jxbt/nightvision_slack_importer.git
+  - cd nightvision_slack_importer
+  - chmod +x install.sh && sudo ./install.sh
+  - python3 -m venv .venv
+  - source .venv/bin/activate
+  - pip install -r requirements.txt
+  - cd ..
+
+  - echo "(8) Run NightVision Slack Importer"
+  - cd nightvision_slack_importer
+  - source .venv/bin/activate
+  - python3 nightvision_slack_importer.py --sarif ../results.sarif --token $SLACK_TOKEN --channel $SLACK_CHANNEL_ID
+
