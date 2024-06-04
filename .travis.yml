@@ -8,9 +8,9 @@ env:
     - NIGHTVISION_TARGET=javaspringvulny-api
     - NIGHTVISION_APP=javaspringvulny-api
     - NIGHTVISION_AUTH=javaspringvulny-api
-    - secure: <encrypted-NIGHTVISION_TOKEN>
-    - secure: <encrypted-SLACK_TOKEN>
-    - secure: <encrypted-SLACK_CHANNEL_ID>
+    - NIGHTVISION_TOKEN=NIGHTVISION_TOKEN
+    - SLACK_TOKEN=SLACK_TOKEN
+    - SLACK_CHANNEL_ID=SLACK_CHANNEL_ID
 
 script:
   # Update packages and install Docker Compose
