@@ -1,52 +1,67 @@
-dist: jammy
+name: Test Case - Email - Java Spring App
 
-services:
-  - docker
+on:
+#  push:
+  workflow_dispatch:
 
 env:
-  global:
-    - NIGHTVISION_TARGET=javaspringvulny-api
-    - NIGHTVISION_APP=javaspringvulny-api
-    - NIGHTVISION_AUTH=javaspringvulny-api
-    - secure: <encrypted-NIGHTVISION_TOKEN>
-    - secure: <encrypted-SENDER_EMAIL>
-    - secure: <encrypted-SENDER_PASSWORD>
-    - secure: <encrypted-RECEIVER_EMAIL>
+  NIGHTVISION_TOKEN: ${{ secrets.NIGHTVISION_TOKEN }}
+  NIGHTVISION_TARGET: javaspringvulny-api
+  NIGHTVISION_APP: javaspringvulny-api
+  NIGHTVISION_AUTH: javaspringvulny-api
+  SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+  SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+  RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+  
+jobs:
+  test:
+    permissions:
+      security-events: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: (1) Clone Code
+        uses: actions/checkout@v3
+      
+      - name: (2) Install NightVision
+        run: |
+          wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
+          sudo mv nightvision /usr/local/bin/
+          python -m pip install semgrep --user
 
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y docker-compose python3-pip
-  - wget -qO- https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz | tar -xz
-  - sudo mv nightvision /usr/local/bin/
-  - pip3 install --user semgrep
+      - name: (3) Extract API documentation from code
+        run: |
+          nightvision swagger extract ./ -t ${{ env.NIGHTVISION_TARGET }} --lang spring || true
+          if [ ! -e openapi-spec.yml ]; then
+              cp backup-openapi-spec.yml openapi-spec.yml
+          fi
 
-script:
-  - echo "(3) Extract API documentation from code"
-  - |
-    nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
-    if [ ! -e openapi-spec.yml ]; then
-        cp backup-openapi-spec.yml openapi-spec.yml
-    fi
+      - name: (4) Start the app
+        run: |
+          docker-compose up -d
+          sleep 10
 
-  - echo "(4) Start the app"
-  - docker-compose up -d
-  - sleep 10
+      - name: (5) Scan the API
+        run: |
+          nightvision scan -t ${{ env.NIGHTVISION_TARGET }} -a ${{ env.NIGHTVISION_APP }} --auth ${{ env.NIGHTVISION_AUTH }} > scan-results.txt
+          nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
 
-  - echo "(5) Scan the API"
-  - nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
-  - nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
+      - name: (6) Upload SARIF file to GitHub Security Alerts if vulnerabilities are found
+        uses: github/codeql-action/upload-sarif@v2
+        if: success()
+        with:
+          sarif_file: results.sarif
 
+      - name: (7) Install nightvision mailer reporter and dependencies
+        run: |
+          git clone https://github.com/jxbt/nightvision_mail_reporter.git
+          cd nightvision_mail_reporter
+          chmod +x install.sh && sudo ./install.sh
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip3 install -r requirements.txt
 
-  - echo "(6) Install nightvision mailer reporter and dependencies"
-  - git clone https://github.com/jxbt/nightvision_mail_reporter.git
-  - cd nightvision_mail_reporter
-  - chmod +x install.sh && sudo ./install.sh
-  - python3 -m venv .venv
-  - source .venv/bin/activate
-  - pip install -r requirements.txt
-  - cd ..
-
-  - echo "(7) Run NightVision mailer reporter"
-  - cd nightvision_mail_reporter
-  - source .venv/bin/activate
-  - python3 main.py --sarif ../results.sarif --sender $SENDER_EMAIL --password "$SENDER_PASSWORD" --receiver $RECEIVER_EMAIL --gmail
+      - name: (8) Run NightVision mailer reporter
+        run: |
+          cd nightvision_mail_reporter
+          source .venv/bin/activate
+          python3 main.py --sarif ../results.sarif --sender ${{ env.SENDER_EMAIL }} --password "${{ env.SENDER_PASSWORD }}" --receiver ${{ env.RECEIVER_EMAIL }} --gmail
