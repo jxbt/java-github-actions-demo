@@ -55,4 +55,4 @@ script:
   - echo "(7) Run NightVision mailer reporter"
   - cd nightvision_mail_reporter
   - source .venv/bin/activate
-  - python3 main.py --sarif ../results.sarif --sender $SENDER_EMAIL --password "$SENDER_PASSWORD" --receiver $RECEIVER_EMAIL --gmail
+  - python3 main.py --sarif ../results.sarif --sender $SENDER_EMAIL --password-b64 "$SENDER_PASSWORD" --receiver $RECEIVER_EMAIL --gmail
