@@ -29,7 +29,8 @@ jobs:
       - run:
           name: Extract API documentation from code
           command: |
-            docker run --rm -v $(pwd):/mnt --env NIGHTVISION_TOKEN="$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision swagger extract /mnt -t $NIGHTVISION_TARGET --lang spring
+            export NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN
+            docker run --rm -v $(pwd):/mnt --env NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN alexnightvision/nightvision-cli nightvision swagger extract /mnt -t $NIGHTVISION_TARGET --lang spring
             if [ ! -e openapi-spec.yml ]; then
               cp backup-openapi-spec.yml openapi-spec.yml
             fi
@@ -43,6 +44,7 @@ jobs:
       - run:
           name: Scan the API
           command: |
+            export NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN
             docker run --rm -v $(pwd):/mnt --env NIGHTVISION_TOKEN="$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
             docker run --rm -v $(pwd):/mnt --env NIGHTVISION_TOKEN="$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
             
