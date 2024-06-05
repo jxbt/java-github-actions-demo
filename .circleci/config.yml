@@ -45,7 +45,7 @@ jobs:
           command: |
             docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
             docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
-            mv results.sarif /mnt/results.sarif
+            
 
       - run:
           name: Install nightvision PDF report generator and dependencies
