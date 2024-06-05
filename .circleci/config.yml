@@ -25,7 +25,6 @@ jobs:
           name: Install Dependencies
           command: |
             sudo apt-get update && sudo apt-get install -y python3-pip docker-compose
-            python3 -m pip install semgrep
 
       - run:
           name: Extract API documentation from code
