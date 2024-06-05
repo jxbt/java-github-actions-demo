@@ -6,10 +6,9 @@ workflows:
     jobs:
       - test
 
-
 jobs:
   test:
-  
+
     machine:
       image: ubuntu-2204:2024.04.4
 
@@ -17,41 +16,39 @@ jobs:
       NIGHTVISION_TARGET: javaspringvulny-api
       NIGHTVISION_APP: javaspringvulny-api
       NIGHTVISION_AUTH: javaspringvulny-api
+      NIGHTVISION_TOKEN: ${{ secrets.NIGHTVISION_TOKEN }}
+
     steps:
       - checkout
 
       - run:
           name: Install Dependencies
           command: |
-            sudo apt-get update && sudo apt-get install -y python3-pip
-            wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz
-            sudo mv nightvision /usr/local/bin/
+            sudo apt-get update && sudo apt-get install -y python3-pip docker-compose
             python3 -m pip install semgrep
 
       - run:
           name: Extract API documentation from code
           command: |
-            nightvision swagger extract ./ -t $NIGHTVISION_TARGET --lang spring || true
+            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision swagger extract /mnt -t $NIGHTVISION_TARGET --lang spring
             if [ ! -e openapi-spec.yml ]; then
               cp backup-openapi-spec.yml openapi-spec.yml
-            fi
 
       - run:
           name: Start the app
           command: |
-            chmod +x setup.sh
-            sudo ./setup.sh
+            sudo docker-compose up -d
             sleep 20
 
       - run:
           name: Scan the API
           command: |
-            nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
-            nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
-
+            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
+            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
+            mv results.sarif /mnt/results.sarif
 
       - run:
-          name:  Install nightvision PDF report generator and dependencies
+          name: Install nightvision PDF report generator and dependencies
           shell: /bin/bash
           command: |
             git clone https://github.com/jxbt/nightvision_reporter.git
@@ -60,13 +57,11 @@ jobs:
             sudo ./install.sh
             python3 -m venv .venv
             source .venv/bin/activate
-            pip3 install -r requirements.txt  
-
+            pip3 install -r requirements.txt
 
       - run:
           name: Generate PDF Report from SARIF
           command: |
-
             cd nightvision_reporter
             source .venv/bin/activate
             python3 main.py --sarif ../results.sarif --out nightvision-report.pdf
@@ -74,4 +69,3 @@ jobs:
       - store_artifacts:
           path: nightvision_reporter/nightvision-report.pdf
           destination: reports/nightvision-report.pdf
-
