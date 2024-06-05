@@ -33,6 +33,7 @@ jobs:
             docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision swagger extract /mnt -t $NIGHTVISION_TARGET --lang spring
             if [ ! -e openapi-spec.yml ]; then
               cp backup-openapi-spec.yml openapi-spec.yml
+            fi
 
       - run:
           name: Start the app
