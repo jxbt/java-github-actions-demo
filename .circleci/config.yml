@@ -29,7 +29,7 @@ jobs:
       - run:
           name: Extract API documentation from code
           command: |
-            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision swagger extract /mnt -t $NIGHTVISION_TARGET --lang spring
+            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=${NIGHTVISION_TOKEN}" alexnightvision/nightvision-cli nightvision swagger extract /mnt -t $NIGHTVISION_TARGET --lang spring
             if [ ! -e openapi-spec.yml ]; then
               cp backup-openapi-spec.yml openapi-spec.yml
             fi
@@ -38,14 +38,14 @@ jobs:
           name: Start the app
           command: |
             sudo docker-compose up -d
-            sleep 25
+            sleep 20
 
       - run:
           name: Scan the API
           command: |
-            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
-            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=$NIGHTVISION_TOKEN" alexnightvision/nightvision-cli nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
-            
+            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=${NIGHTVISION_TOKEN}" alexnightvision/nightvision-cli nightvision scan -t $NIGHTVISION_TARGET -a $NIGHTVISION_APP --auth $NIGHTVISION_AUTH > scan-results.txt
+            docker run --rm -v $(pwd):/mnt --env "NIGHTVISION_TOKEN=${NIGHTVISION_TOKEN}" alexnightvision/nightvision-cli nightvision export sarif -s "$(head -n 1 scan-results.txt)" --swagger-file openapi-spec.yml
+            mv results.sarif /mnt/results.sarif
 
       - run:
           name: Install nightvision PDF report generator and dependencies
