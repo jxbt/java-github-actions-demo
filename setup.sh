@@ -34,10 +34,6 @@ cp -r ./* "$APP_DIR/"
 echo "Modifying PostgreSQL configuration..."
 sed -i 's/localhost:5432/db:5432/' "$APP_DIR/src/main/resources/application-postgresql.properties"
 
-# Set JAVA_HOME for Gradle
-export JAVA_HOME=/usr/lib/jvm/java-18-openjdk-amd64
-export PATH=$JAVA_HOME/bin:$PATH
-
 # Step 6: Build Your Application
 echo "Building application..."
 cd "$APP_DIR"
