@@ -20,9 +20,10 @@ ALTER ROLE postgresql SET timezone TO 'UTC';
 GRANT ALL PRIVILEGES ON DATABASE postgresql TO postgresql;
 EOF
 
-# Step 3: Install OpenJDK 11
-echo "Installing OpenJDK 11..."
-sudo apt install -y openjdk-11-jdk
+# Step 3: Install OpenJDK 21
+echo "Installing OpenJDK 21..."
+sudo apt install -y openjdk-21-jdk
+
 
 # Step 4: Set Up Your Application
 echo "Setting up application directories..."
