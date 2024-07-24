@@ -20,7 +20,7 @@ pipeline {
                 script {
                     sh 'wget -c https://downloads.nightvision.net/binaries/latest/nightvision_latest_linux_amd64.tar.gz -O - | tar -xz'
                     
-                    sh 'python3 -m pip install semgrep'
+                    sh 'python3 -m pip install --break-system-packages semgrep'
                 }
             }
         }
